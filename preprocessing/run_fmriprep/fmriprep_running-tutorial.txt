@@ -1,0 +1,29 @@
+1 - Copy the dataset to cluster:
+from local machine:scp <LOCAL_PATH>/bids peres@navigator.lca.uc.pt:<PROJECT_FOLDER>/bids
+
+2 - Load the Singularity module:
+module load Singularity
+
+3 - Check the fmriprep version:
+https://github.com/poldracklab/fmriprep/releases
+
+4 - If it is not the latest, create the latest Singularity image:
+singularity build /my_images/fmriprep-<version>.simg docker://poldracklab/fmriprep:<version>
+
+5 - Configure the slurm code (sbatch_decoding-rest.slurm) for the specific application.
+	4.1 - On the header, lines 10 and 11, define the log path where the fmriprep will output the log and error files.
+	4.2 - On the header, line 12, define the email address to slurm tells you when the processing is done.
+	4.3 - Main code, line 17, define the path to the bids dataset (<PROJECT_FOLDER> defined in the step 1) to be pre-processed.
+	4.4 - Main code, line 19, define the path to the FreeSurfer license file, commonly HOME/.freesurfer.txt.
+	4.5 - Main code, line 23, define the path to the fmriprep container (Defined in the step 3).
+
+6 - Run the slurm code using the sbatch array, this option allow running each subject (lines of the participants.tsv) in a separeted (parallel) job.
+sbatch --array=1-$(( $( wc -l <PATH_TO_BIDS>/participants.tsv | cut -f1 -d' ' ) - 1 )) <PATH_TO_SLURM>/sbatch_decoding-rest.slurm
+
+7 - To check how the processing is going:
+	6.1 - squeue
+	6.2 - sacct
+	6.3 - top: from the ssh terminal, ssh the processing node and enter the comand top. 
+
+8 - When the processing is finished copy the files in the cluster to the local machine:
+from local machine:scp -r <USER>@navigator.lca.uc.pt:<PARENT_BIDS>/derivatives <LOCAL_FOLDER>/derivatives
