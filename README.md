@@ -15,4 +15,5 @@ The complete pipeline depends on several packages: Matlab, Anaconda, dcm2niix, f
 
 ### Contact ###
 peres.asc@gmail.com - Andre Peres
+
 https://proactionlab.fpce.uc.pt
